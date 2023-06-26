@@ -80,7 +80,8 @@ if len(imgPaths) > 0:
   dt_process = processDataset(imgPaths, read_img)
   batch_size = min(500, len(dt_process))
   process_dl = trc.utils.data.DataLoader(dt_process, batch_size)
-  print('Processing '+str(len(dt_process))+' images...')
+  if len(imgPaths) == 1: print('Processing 1 image...')
+  else: print('Processing '+str(len(dt_process))+' images...')
   start_time = time.time()
   
   net = trc.load(NET)
@@ -89,7 +90,8 @@ if len(imgPaths) > 0:
     with trc.set_grad_enabled(False):
       res = net.forward(X).data
     Names += names
-    preds = trc.cat([preds, res])
+    if res.dim() == 0: preds = trc.cat([preds, res.reshape(1)])
+    else: preds = trc.cat([preds, res])
   print('Finished! Total time: '+str(time.time()-start_time)+'\n')
 
   print('Preparing an output...')
